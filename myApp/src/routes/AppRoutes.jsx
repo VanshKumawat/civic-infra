@@ -1,9 +1,14 @@
 import { Routes, Route } from "react-router-dom"
 
+import ProtectedRoute from "../components/ProtectedRoute"
+
+import ComplaintForm from "../pages/ComplaintForm"
+
 import Home from "../pages/Home"
 import Login from "../pages/Login"
 import Register from "../pages/Register"
 import Dashboard from "../pages/Dashboard"
+
 
 function AppRoutes() {
   return (
@@ -15,7 +20,13 @@ function AppRoutes() {
 
       <Route path="/register" element={<Register />} />
 
-      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/dashboard" element={
+                                        <ProtectedRoute>
+                                        <Dashboard />
+                                        </ProtectedRoute>
+                                      }/>
+
+      <Route path="/complaint" element={<ComplaintForm />} />
 
     </Routes>
   )

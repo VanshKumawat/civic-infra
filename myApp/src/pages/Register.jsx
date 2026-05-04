@@ -1,4 +1,5 @@
 import { useState } from "react"
+import API from "../api/axios"
 
 function Register() {
 
@@ -6,12 +7,32 @@ function Register() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
 
-  function handleRegister(e) {
+  async function handleRegister(e) {
+
     e.preventDefault()
 
-    console.log(name)
-    console.log(email)
-    console.log(password)
+    try {
+
+      const response = await API.post(
+        "/auth/register",
+        {
+          name,
+          email,
+          password
+        }
+      )
+
+      alert(response.data.message)
+
+      setName("")
+      setEmail("")
+      setPassword("")
+
+    }
+    catch(error){
+      console.log(error)
+    }
+
   }
 
   return (

@@ -10,9 +10,14 @@ function Navbar() {
 
       <div className="flex gap-6 text-lg">
         <Link to="/">Home</Link>
+
         <Link to="/login">Login</Link>
+
         <Link to="/register">Register</Link>
+
         <Link to="/dashboard">Dashboard</Link>
+
+        <Link to="/complaint">Complaint</Link>
       </div>
 
     </nav>

@@ -1,15 +1,47 @@
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
+import API from "../api/axios"
 
 function Login() {
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
 
-  function handleLogin(e) {
+  const navigate = useNavigate()
+
+  async function handleLogin(e) {
+
     e.preventDefault()
 
-    console.log(email)
-    console.log(password)
+    try {
+
+      const response = await API.post(
+        "/auth/login",
+        {
+          email,
+          password
+        }
+      )
+
+      alert(response.data.message)
+
+      console.log(response.data)
+
+      localStorage.setItem(
+        "token",
+        response.data.token
+      )
+
+      navigate("/dashboard")
+      
+    }
+    catch(error){
+      localStorage.removeItem("token")
+       alert(
+      error.response.data.message
+       )
+    }
+
   }
 
   return (
