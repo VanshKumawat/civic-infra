@@ -27,12 +27,10 @@ function Login() {
 
       console.log(response.data)
 
-      localStorage.setItem(
-        "token",
-        response.data.token
-      )
+     localStorage.setItem("token", response.data.token)
+      localStorage.setItem("user", JSON.stringify(response.data.user))
 
-      navigate("/dashboard")
+      window.location.href = "/complaints" 
       
     }
     catch(error){

@@ -4,6 +4,8 @@ import ProtectedRoute from "../components/ProtectedRoute"
 
 import ComplaintForm from "../pages/ComplaintForm"
 
+import Complaints from "../pages/Complaints"
+
 import Home from "../pages/Home"
 import Login from "../pages/Login"
 import Register from "../pages/Register"
@@ -27,7 +29,8 @@ function AppRoutes() {
                                       }/>
 
       <Route path="/complaint" element={<ComplaintForm />} />
-
+      
+      <Route path="/complaints" element={<Complaints />} />
     </Routes>
   )
 }

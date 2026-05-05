@@ -18,6 +18,10 @@ function Navbar() {
         <Link to="/dashboard">Dashboard</Link>
 
         <Link to="/complaint">Complaint</Link>
+
+        <Link to="/complaints">Complaints</Link>
+
+        
       </div>
 
     </nav>

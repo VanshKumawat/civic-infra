@@ -23,7 +23,8 @@ function ComplaintForm() {
 
       const response = await API.post(
         "/complaints/create",
-        formData
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
       )
 
       alert(response.data.message)
