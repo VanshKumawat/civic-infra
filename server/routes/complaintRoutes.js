@@ -17,8 +17,9 @@ router.post(
     upload.single("image"),
     (req, res) => {
 
-       console.log("BODY:", req.body)       // ← add this
-    console.log("FILE:", req.file)       // ← add this
+    
+    console.log("BODY:", req.body)       
+    console.log("FILE:", req.file)       
     console.log("USER:", req.user)  
     
         const {
@@ -103,14 +104,53 @@ router.get("/", verifyToken, (req, res) => {
 })
 
 router.put(
+  "/update-status/:id",
+  verifyToken,
+  checkRole(["officer", "admin"]),
+  (req, res) => {
+
+    if (req.user.role !== "officer" && req.user.role !== "admin") {
+    return res.status(403).json({ message: "Access denied" })
+    }
+    
+    const { id } = req.params
+    const { status } = req.body
+
+    const sql = `UPDATE complaints SET status = ? WHERE id = ?`
+
+    db.query(sql, [status, id], (err, result) => {
+
+      if (err) {
+        return res.status(500).json(err)
+      }
+
+      res.json({ message: "Status Updated" })
+
+    })
+
+  }
+)
+
+router.put(
   "/upload-proof/:id",
   verifyToken,
   checkRole(["officer", "admin"]),
   upload.single("proof"),
   (req, res) => {
 
+    if (req.user.role !== "officer" && req.user.role !== "admin") {
+    return res.status(403).json({ message: "Access denied" })
+    }
+
     const { id } = req.params
-    const proofImage = req.file.filename
+    const { status } = req.body
+
+    if (!req.file) {
+    return res.status(400).json({ message: "No file uploaded" })
+    }
+    
+    const proofFilename = req.file.filename
+    console.log("Updating:", id, status)
 
     const sql = `
       UPDATE complaints
@@ -118,9 +158,10 @@ router.put(
       WHERE id = ?
     `
 
-    db.query(sql, [proofImage, id], (err, result) => {
+     db.query(sql, [proofFilename, id], (err, result) => {
 
       if (err) {
+        console.log(err)
         return res.status(500).json(err)
       }
 
@@ -130,5 +171,50 @@ router.put(
 
   }
 )
+
+router.get("/stats", verifyToken, (req, res) => {
+
+  const user = req.user
+
+  let sql = ""
+  let values = []
+
+  if (user.role === "officer" || user.role === "admin") {
+ // Officer/Admin → all complaints
+    sql = `
+      SELECT 
+        COUNT(*) AS total,
+        SUM(status = 'Pending') AS pending,
+        SUM(status = 'In Progress') AS inProgress,
+        SUM(status = 'Resolved') AS resolved
+      FROM complaints
+    `
+
+  } else {
+ // Normal user → only their complaints
+    sql =  `
+      SELECT 
+        COUNT(*) AS total,
+        SUM(LOWER(status) = 'pending') AS pending,
+        SUM(LOWER(status) = 'in progress') AS inProgress,
+        SUM(LOWER(status) = 'resolved') AS resolved
+      FROM complaints
+      WHERE user_id = ?
+    `
+
+    values = [user.id]
+  }
+
+  db.query(sql, values, (err, result) => {
+
+    if (err) {
+      return res.status(500).json(err)
+    }
+
+    res.json(result[0])
+
+  })
+
+})
 
 module.exports = router

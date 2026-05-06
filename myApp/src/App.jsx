@@ -4,6 +4,7 @@ import Navbar from "./components/Navbar"
 import AppRoutes from "./routes/AppRoutes"
 
 function App() {
+  const user = JSON.parse(localStorage.getItem("user"))
   return (
     <BrowserRouter>
 

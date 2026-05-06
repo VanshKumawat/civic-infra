@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom"
+import { Routes, Route , Navigate } from "react-router-dom"
 
 import ProtectedRoute from "../components/ProtectedRoute"
 
@@ -13,6 +13,9 @@ import Dashboard from "../pages/Dashboard"
 
 
 function AppRoutes() {
+
+   const user = JSON.parse(localStorage.getItem("user") || "{}") 
+
   return (
     <Routes>
 
@@ -31,6 +34,11 @@ function AppRoutes() {
       <Route path="/complaint" element={<ComplaintForm />} />
       
       <Route path="/complaints" element={<Complaints />} />
+
+      <Route path="/dashboard" element={<Dashboard />} />
+
+      <Route path="/submit" element={ user?.role === "citizen" ? <ComplaintForm />: <Navigate to="/dashboard" /> }/>
+
     </Routes>
   )
 }

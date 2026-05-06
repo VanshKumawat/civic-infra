@@ -5,8 +5,10 @@ import { useNavigate } from "react-router-dom"
 import API from "../api/axios"
 
 function Complaints() {
-
+  
   const [complaints, setComplaints] = useState([])
+
+  const [filter, setFilter] = useState("All")
 
   const user = JSON.parse(localStorage.getItem("user"))
 
@@ -36,9 +38,29 @@ function Complaints() {
         Complaints Dashboard
       </h1>
 
+    <div className="flex gap-3 mb-6 justify-center">
+
+  {["All", "Pending", "In Progress", "Resolved"].map((item) => (
+    <button
+      key={item}
+      onClick={() => setFilter(item)}
+      className={`px-4 py-2 rounded-lg ${
+        filter === item
+          ? "bg-blue-600 text-white"
+          : "bg-gray-200"
+      }`}
+    >
+      {item}
+    </button>
+  ))}
+
+</div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
-        {complaints.map((complaint) => (
+       {complaints
+  .filter((c) => filter === "All" || c.status === filter)
+  .map((complaint) => (
 
           <div
             key={complaint.id}
@@ -100,10 +122,11 @@ function Complaints() {
                 <p className="mt-4 text-sm font-semibold">
                   Update Status:
                 </p>
-
+              {(user?.role === "officer" || user?.role === "admin") && (
                 <select
                   value={complaint.status}
                   onChange={async (e) => {
+                    console.log("Selected:", e.target.value)
 
                     const newStatus = e.target.value
 
@@ -111,17 +134,13 @@ function Complaints() {
 
                       await API.put(
                         `/complaints/update-status/${complaint.id}`,
-                        { status: newStatus }
+                        { status: newStatus },
+
+                        
                       )
 
                       // update UI instantly
-                      setComplaints((prev) =>
-                        prev.map((item) =>
-                          item.id === complaint.id
-                            ? { ...item, status: newStatus }
-                            : item
-                        )
-                      )
+                   fetchComplaints()
 
                     } catch (error) {
                       console.log(error)
@@ -130,10 +149,11 @@ function Complaints() {
                   }}
                   className="mt-1 border p-2 rounded w-full"
                 >
-                  <option>Pending</option>
-                  <option>In Progress</option>
-                  <option>Resolved</option>
+                 <option value="Pending">Pending</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Resolved">Resolved</option>
                 </select>
+                )}
 
                 {/* PROOF UPLOAD */}
                 <p className="mt-4 text-sm font-semibold">
