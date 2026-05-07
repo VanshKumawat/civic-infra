@@ -77,14 +77,12 @@ router.post("/login", (req, res) => {
         }
 
         const token = jwt.sign(
-            {
-                id: user.id,
-                role: user.role
-            },
-            "SECRET_KEY",
-            {
-                expiresIn: "1d"
-            }
+        {
+        id: user.id,
+        role: user.role,
+        department: user.department
+        },
+        process.env.JWT_SECRET
         )
 
         res.json({
@@ -94,7 +92,8 @@ router.post("/login", (req, res) => {
                 id: user.id,
                 name: user.name,
                 email: user.email,
-                role: user.role
+                role: user.role,
+                department: user.department
             }
         })
 

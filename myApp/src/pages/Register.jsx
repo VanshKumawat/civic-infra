@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useNavigate, Link } from "react-router-dom"
 import API from "../api/axios"
 
 function Register() {
@@ -7,14 +8,15 @@ function Register() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
 
+  const navigate = useNavigate()
+
   async function handleRegister(e) {
 
     e.preventDefault()
 
     try {
 
-      const response = await API.post(
-        "/auth/register",
+      const response = await API.post( "/auth/register",
         {
           name,
           email,
@@ -24,63 +26,103 @@ function Register() {
 
       alert(response.data.message)
 
+      
+
       setName("")
       setEmail("")
       setPassword("")
 
+      navigate("/login")
+
     }
     catch(error){
-      console.log(error)
+    alert(error.response?.data?.message || "Registration failed")
     }
 
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-6">
 
-      <div className="bg-white p-10 rounded-2xl shadow-lg w-400px">
+      <Link
+      to="/"
+      className="absolute top-6 left-6 bg-white px-5 py-2 rounded-xl shadow hover:bg-gray-100 transition z-50"
+      >
+      ← Home
+      </Link>
 
-        <h1 className="text-3xl font-bold text-center mb-8">
-          Register
+      <div className="bg-white w-full max-w-md p-10 rounded-2xl shadow-xl">
+
+          <h1 className="text-3xl font-bold text-center text-blue-900 mb-2">
+          Create Account
         </h1>
 
-        <form
-          onSubmit={handleRegister}
-          className="flex flex-col gap-5"
-        >
+        <p className="text-center text-gray-500 mb-8">
+          Register to report and track civic complaints
+        </p>
+
+        <form onSubmit={handleRegister} className="flex flex-col gap-5">
+          <div>
+            <label className="block mb-2 font-semibold text-gray-700">
+              Full Name
+            </label>
 
           <input
             type="text"
-            placeholder="Enter Name"
-            className="border p-3 rounded-lg outline-none"
+            placeholder="Enter Your Name"
+            className="w-full border border-gray-300 p-3 rounded-lg outline-none focus:border-blue-700"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            required
           />
+           </div>
+
+          <div>
+               <label className="block mb-2 font-semibold text-gray-700">
+                Email Address
+                </label>
 
           <input
             type="email"
             placeholder="Enter Email"
-            className="border p-3 rounded-lg outline-none"
+            className="w-full border border-gray-300 p-3 rounded-lg outline-none focus:border-blue-700"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+             required
           />
+          </div>
+
+           <div>
+            <label className="block mb-2 font-semibold text-gray-700">
+              Password
+            </label>
 
           <input
             type="password"
             placeholder="Enter Password"
-            className="border p-3 rounded-lg outline-none"
+            className="w-full border border-gray-300 p-3 rounded-lg outline-none focus:border-blue-700"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
           />
+          </div>
 
-          <button
-            className="bg-green-700 text-white py-3 rounded-lg hover:bg-green-600 transition"
-          >
+          <button type="submit"
+            className="bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition"
+          > 
+          
             Register
           </button>
 
         </form>
 
+         <p className="text-center mt-6 text-gray-600">
+          Already have an account?{" "}
+          <Link to="/login" className="text-blue-900 font-semibold">
+            Login
+          </Link>
+        </p>
+        
       </div>
 
     </div>

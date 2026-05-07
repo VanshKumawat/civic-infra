@@ -2,7 +2,6 @@ import { useState } from "react"
 import API from "../api/axios"
 
 function ComplaintForm() {
-
   const [title, setTitle] = useState("")
   const [category, setCategory] = useState("")
   const [description, setDescription] = useState("")
@@ -21,76 +20,166 @@ function ComplaintForm() {
       formData.append("location", location)
       formData.append("image", image)
 
-      const response = await API.post(
-        "/complaints/create",
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      )
+      const response = await API.post("/complaints/create", formData)
 
       alert(response.data.message)
 
+      setTitle("")
+      setCategory("")
+      setDescription("")
+      setLocation("")
+      setImage(null)
+
     } catch (error) {
-      console.log(error)
+      alert(error.response?.data?.message || "Complaint submission failed")
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-10">
-      <div className="bg-white p-10 rounded-2xl shadow-lg w-full max-w-2xl">
+    <div className="min-h-screen bg-gray-100 px-6 py-12">
 
-        <h1 className="text-3xl font-bold mb-8 text-center">
-          Submit Complaint
-        </h1>
+      <div className="max-w-5xl mx-auto">
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        <div className="text-center mb-10">
+          <h1 className="text-4xl font-bold text-blue-900">
+            Submit a Complaint
+          </h1>
+          <p className="text-gray-600 mt-3">
+            Report civic problems with details and image proof.
+          </p>
+        </div>
 
-          <input
-            type="text"
-            placeholder="Title"
-            className="border p-3 rounded-lg"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-          <select
-            className="border p-3 rounded-lg"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          >
-            <option value="">Select Category</option>
-            <option value="Water Leakage">Water Leakage</option>
-            <option value="Pothole">Pothole</option>
-            <option value="Streetlight">Streetlight</option>
-            <option value="Garbage">Garbage</option>
-          </select>
+          {/* INFO CARD */}
+          <div className="bg-blue-900 text-white rounded-2xl p-10 shadow-xl">
+            <h2 className="text-3xl font-bold mb-6">
+              Help Improve Your Area
+            </h2>
 
-          <textarea
-            placeholder="Description"
-            className="border p-3 rounded-lg"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
+            <p className="text-gray-200 mb-8">
+              Submit complaints about public issues such as road damage,
+              water leakage, garbage, drainage, or streetlight failure.
+            </p>
 
-          <input
-            type="text"
-            placeholder="Location"
-            className="border p-3 rounded-lg"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-          />
+            <div className="space-y-5">
+              <div className="bg-blue-800 p-5 rounded-xl">
+                ✅ Upload clear issue photo
+              </div>
 
-          <input
-            type="file"
-            className="border p-3 rounded-lg"
-            onChange={(e) => setImage(e.target.files[0])}
-          />
+              <div className="bg-blue-800 p-5 rounded-xl">
+                📍 Add correct location
+              </div>
 
-          <button className="bg-red-600 text-white py-3 rounded-lg">
-            Submit Complaint
-          </button>
+              <div className="bg-blue-800 p-5 rounded-xl">
+                📊 Track status anytime
+              </div>
 
-        </form>
+              <div className="bg-blue-800 p-5 rounded-xl">
+                🏢 Officer reviews and resolves complaint
+              </div>
+            </div>
+          </div>
+
+          {/* FORM CARD */}
+          <div className="bg-white rounded-2xl shadow-xl p-10">
+
+            <form onSubmit={handleSubmit} className="space-y-5">
+
+              <div>
+                <label className="block mb-2 font-semibold text-gray-700">
+                  Complaint Title
+                </label>
+                <input
+                  type="text"
+                  placeholder="Example: Road pothole near college"
+                  className="w-full border border-gray-300 p-3 rounded-lg outline-none focus:border-blue-700"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block mb-2 font-semibold text-gray-700">
+                  Category
+                </label>
+                <select
+                  className="w-full border border-gray-300 p-3 rounded-lg outline-none focus:border-blue-700"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  required
+                >
+                  <option value="">Select Category</option>
+                  <option value="Water Leakage">Water Leakage</option>
+                  <option value="Pothole">Pothole</option>
+                  <option value="Streetlight">Streetlight</option>
+                  <option value="Garbage">Garbage</option>
+                  <option value="Drainage">Drainage</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block mb-2 font-semibold text-gray-700">
+                  Description
+                </label>
+                <textarea
+                  placeholder="Describe the problem clearly..."
+                  className="w-full border border-gray-300 p-3 rounded-lg h-32 outline-none focus:border-blue-700"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block mb-2 font-semibold text-gray-700">
+                  Location
+                </label>
+                <input
+                  type="text"
+                  placeholder="Example: Near bus stand, Jaipur"
+                  className="w-full border border-gray-300 p-3 rounded-lg outline-none focus:border-blue-700"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block mb-2 font-semibold text-gray-700">
+                  Upload Issue Image
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="w-full border border-gray-300 p-3 rounded-lg"
+                  onChange={(e) => setImage(e.target.files[0])}
+                  required
+                />
+
+                {image && (
+                  <p className="text-sm text-green-600 mt-2">
+                    Selected: {image.name}
+                  </p>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition"
+              >
+                Submit Complaint
+              </button>
+
+            </form>
+
+          </div>
+
+        </div>
+
       </div>
+
     </div>
   )
 }

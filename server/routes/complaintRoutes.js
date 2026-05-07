@@ -31,6 +31,26 @@ router.post(
         const user_id = req.user.id
         const image = req.file ? req.file.filename : null
 
+
+          let department = ""
+
+            if (category === "Pothole") {
+            department = "Road Department"
+          }
+          else if (category === "Water Leakage") {
+            department = "Water Department"
+          }
+          else if (category === "Streetlight") {
+            department = "Electricity Department"
+          }
+          else if (category === "Garbage") {
+            department = "Sanitation Department"
+          }
+          else if (category === "Drainage") {
+            department = "Drainage Department"
+          }
+
+
         const sql = `
             INSERT INTO complaints
             (
@@ -39,9 +59,11 @@ router.post(
                 description,
                 location,
                 image,
-                user_id
+                status,
+                user_id,
+                department
             )
-            VALUES (?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `
 
         db.query(
@@ -52,7 +74,9 @@ router.post(
                 description,
                 location,
                 image,
-                user_id
+                "Pending",
+                req.user.id,
+                department
             ],
             (err, result) => {
 
@@ -69,26 +93,46 @@ router.post(
 
     }
 )
-
 router.get("/", verifyToken, (req, res) => {
 
-  console.log("USER FROM TOKEN:", req.user) 
   const user = req.user
 
   let sql = ""
   let values = []
 
-  if (user.role === "officer" || user.role === "admin") {
+  // Citizen
+  if (user.role === "citizen") {
 
-    // officer sees all
-    sql = "SELECT * FROM complaints ORDER BY id DESC"
+    sql = `
+      SELECT * FROM complaints
+      WHERE user_id = ?
+      ORDER BY created_at DESC
+    `
 
-  } else {
-
-    // normal user sees only their complaints
-    sql = "SELECT * FROM complaints WHERE user_id = ? ORDER BY id DESC"
     values = [user.id]
 
+  }
+
+  // Officer
+  else if (user.role === "officer") {
+
+    sql = `
+      SELECT * FROM complaints
+      WHERE department = ?
+      ORDER BY created_at DESC
+    `
+
+    values = [user.department]
+
+  }
+
+  // Admin
+  else if (user.role === "admin") {
+
+    sql = `
+      SELECT * FROM complaints
+      ORDER BY created_at DESC
+    `
   }
 
   db.query(sql, values, (err, result) => {
@@ -102,6 +146,8 @@ router.get("/", verifyToken, (req, res) => {
   })
 
 })
+
+
 
 router.put(
   "/update-status/:id",
@@ -215,6 +261,26 @@ router.get("/stats", verifyToken, (req, res) => {
 
   })
 
+})
+
+
+router.get("/public-stats", (req, res) => {
+  const sql = `
+    SELECT
+      COUNT(*) AS total,
+      SUM(status = 'Pending') AS pending,
+      SUM(status = 'In Progress') AS inProgress,
+      SUM(status = 'Resolved') AS resolved
+    FROM complaints
+  `
+
+  db.query(sql, (err, result) => {
+    if (err) {
+      return res.status(500).json(err)
+    }
+
+    res.json(result[0])
+  })
 })
 
 module.exports = router

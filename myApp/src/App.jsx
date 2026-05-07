@@ -1,17 +1,30 @@
 import { BrowserRouter } from "react-router-dom"
+import { useLocation } from "react-router-dom"
 
 import Navbar from "./components/Navbar"
 import AppRoutes from "./routes/AppRoutes"
 
-function App() {
-  const user = JSON.parse(localStorage.getItem("user"))
-  return (
-    <BrowserRouter>
+function AppContent() {
 
-      <Navbar />
+  const location = useLocation()
+
+  const hideNavbar =
+    location.pathname === "/login" ||
+    location.pathname === "/register"
+
+  return (
+    <>
+      {!hideNavbar && <Navbar />}
 
       <AppRoutes />
+    </>
+  )
+}
 
+function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
     </BrowserRouter>
   )
 }
